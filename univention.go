@@ -12,14 +12,14 @@ import (
 )
 
 type Request struct {
-	Endpoint 	string
-	Key 		string
-	Token 		string
+	Endpoint string
+	Key      string
+	Token    string
 }
 
 type Response struct {
 	Header string `json:"header"`
-	Body string `json:"body"`
+	Body   string `json:"body"`
 }
 
 type Login struct {
@@ -29,11 +29,10 @@ type Login struct {
 
 type Authorisation struct {
 	gorm.Model
-	Username string 		`json:"username"`
-	Key string 				`json:"key"`
-	Token string 			`json:"token"`
+	Username string `json:"username"`
+	Key      string `json:"key"`
+	Token    string `json:"token"`
 }
-
 
 /*
 func main () {
@@ -43,24 +42,37 @@ func main () {
 
 /*
 Makes the data valid for the authentification
- */
-func createLogin (username, password string) (string,error) {
+*/
+func createLogin(username, password string) (string, error) {
 	b, err := json.Marshal(Login{
 		Username: username,
 		Password: password,
 	})
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	encoded := base64.StdEncoding.EncodeToString(b)
-	return encoded,nil
+	return encoded, nil
+}
+
+func decodeLogin(encoded string) (login Login, err error) {
+	var decoded []byte
+	_, err = base64.StdEncoding.Decode(decoded, []byte(encoded))
+	if err != nil {
+		return login, err
+	}
+	err = json.Unmarshal(decoded, &login)
+	if err != nil {
+		return login, err
+	}
+	return login, nil
 }
 
 /*
 Get a new Request
- */
-func NewRequest (endpoint,username, password string) (request *Request, response Response, err error){
-	enc, err := createLogin(username,password)
+*/
+func NewRequest(endpoint, username, password string) (request *Request, response Response, err error) {
+	enc, err := createLogin(username, password)
 	if err != nil {
 		return nil, Response{}, err
 	}
@@ -91,21 +103,20 @@ func NewRequest (endpoint,username, password string) (request *Request, response
 		}, err
 	}
 
-	err = json.Unmarshal(body,&auth)
-	if err != nil || status != "200 OK"{
+	err = json.Unmarshal(body, &auth)
+	if err != nil || status != "200 OK" {
 		return nil, Response{
 			Header: header,
 			Body:   string(body),
-		},err
+		}, err
 	}
 
 	request = new(Request)
 	request.Key = auth.Key
 	request.Token = auth.Token
 	request.Endpoint = endpoint
-	return request,Response{
+	return request, Response{
 		Header: header,
 		Body:   string(body),
-	},nil
+	}, nil
 }
-
