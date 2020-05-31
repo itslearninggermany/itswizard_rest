@@ -58,7 +58,7 @@ func CreateLogin(username, password string) (string, error) {
 /*
 Decode a Login
 */
-func decodeLogin(encoded string) (login Login, err error) {
+func DecodeLogin(encoded string) (login Login, err error) {
 	var decoded []byte
 	_, err = base64.StdEncoding.Decode(decoded, []byte(encoded))
 	if err != nil {
