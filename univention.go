@@ -75,7 +75,7 @@ func decodeLogin(encoded string) (login Login, err error) {
 Get a new Request
 */
 func NewRequest(endpoint, username, password string) (request *Request, response Response, err error) {
-	enc, err := createLogin(username, password)
+	enc, err := CreateLogin(username, password)
 	if err != nil {
 		return nil, Response{}, err
 	}
