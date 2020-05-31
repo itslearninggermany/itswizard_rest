@@ -43,7 +43,7 @@ func main () {
 /*
 Makes the data valid for the authentification
 */
-func createLogin(username, password string) (string, error) {
+func CreateLogin(username, password string) (string, error) {
 	b, err := json.Marshal(Login{
 		Username: username,
 		Password: password,
@@ -55,6 +55,9 @@ func createLogin(username, password string) (string, error) {
 	return encoded, nil
 }
 
+/*
+Decode a Login
+*/
 func decodeLogin(encoded string) (login Login, err error) {
 	var decoded []byte
 	_, err = base64.StdEncoding.Decode(decoded, []byte(encoded))
