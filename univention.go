@@ -18,8 +18,8 @@ type Request struct {
 }
 
 type Response struct {
-	Header string `json:"header"`
-	Body   string `json:"body"`
+	Header string      `json:"header"`
+	Body   interface{} `json:"body"`
 }
 
 type Login struct {
@@ -97,13 +97,6 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 	header := fmt.Sprint(resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	var auth Authorisation
-
-	if err != nil {
-		return nil, Response{
-			Header: header,
-			Body:   string(body),
-		}, err
-	}
 
 	err = json.Unmarshal(body, &auth)
 	if err != nil || status != "200 OK" {
