@@ -60,11 +60,11 @@ Decode a Login
 */
 func DecodeLogin(encoded string) (login Login, err error) {
 	var decoded []byte
-	_, err = base64.StdEncoding.DecodeString(encoded)
+	erg, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		return login, err
 	}
-	err = json.Unmarshal(decoded, &login)
+	err = json.Unmarshal(decoded, &erg)
 	if err != nil {
 		return login, err
 	}
