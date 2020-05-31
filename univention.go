@@ -60,7 +60,7 @@ Decode a Login
 */
 func DecodeLogin(encoded string) (login Login, err error) {
 	var decoded []byte
-	_, err = base64.StdEncoding.Decode(decoded, []byte(encoded))
+	_, err = base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		return login, err
 	}
