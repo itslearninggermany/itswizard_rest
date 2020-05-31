@@ -59,12 +59,11 @@ func CreateLogin(username, password string) (string, error) {
 Decode a Login
 */
 func DecodeLogin(encoded string) (login Login, err error) {
-	var decoded []byte
 	erg, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		return login, err
 	}
-	err = json.Unmarshal(decoded, &erg)
+	err = json.Unmarshal(erg, &login)
 	if err != nil {
 		return login, err
 	}
