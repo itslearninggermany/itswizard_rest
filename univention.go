@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/itslearninggermany/itswizard_handlingerrors"
 	"github.com/jinzhu/gorm"
@@ -148,4 +149,9 @@ func ResponseError(statusNumber int, err error, w http.ResponseWriter, userName 
 		itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
 		return
 	}
+}
+
+func ResponseError500(w http.ResponseWriter, userName string, dbWebserver *gorm.DB, err error) {
+	ResponseError(500, errors.New("Internal Server Error"), w, userName, dbWebserver)
+	itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
 }
