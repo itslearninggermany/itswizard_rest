@@ -155,3 +155,20 @@ func ResponseError500(w http.ResponseWriter, userName string, dbWebserver *gorm.
 	ResponseError(500, errors.New("Internal Server Error"), w, userName, dbWebserver)
 	itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
 }
+
+func CreateResponse(w http.ResponseWriter, message string, userName string, dbWebserver *gorm.DB, err error) {
+	w.WriteHeader(200)
+	b, err := json.Marshal(Response{
+		Status:  strconv.Itoa(200),
+		Message: message,
+	})
+	if err != nil {
+		itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
+		return
+	}
+	_, err = fmt.Fprint(w, string(b))
+	if err != nil {
+		itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
+		return
+	}
+}
