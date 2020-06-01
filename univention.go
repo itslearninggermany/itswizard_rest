@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"fmt"
+	"github.com/itslearninggermany/itswizard_rest"
 	"github.com/jinzhu/gorm"
 	"github.com/segmentio/objconv/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type Request struct {
@@ -125,4 +128,23 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 		//		Header: header,
 		//		Body: string(body),
 	}, nil
+}
+
+/*
+Sets a status Code and an Error JSON in the body
+*/
+func ResponseError(statusNumber int, err error, w http.ResponseWriter) error {
+	w.WriteHeader(statusNumber)
+	b, err := json.Marshal(itswizard_rest.Response{
+		Status: strconv.Itoa(statusNumber),
+		Error:  err,
+	})
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprint(w, string(b))
+	if err != nil {
+		return err
+	}
+	return nil
 }
