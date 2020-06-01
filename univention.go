@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/segmentio/objconv/json"
 	"io/ioutil"
@@ -99,7 +98,7 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 	defer resp.Body.Close()
 
 	status := resp.Status
-	header := fmt.Sprint(resp.Header)
+	//header := fmt.Sprint(resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	var auth Authorisation
 
