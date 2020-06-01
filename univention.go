@@ -21,9 +21,13 @@ type Request struct {
 }
 
 type Response struct {
-	Status  string `json:"status"`
-	Error   error  `json:"error"`
-	Message string `json:"message"`
+	Status  string      `json:"status"`
+	Error   error       `json:"error"`
+	Message interface{} `json:"message"`
+}
+
+type JWT struct {
+	JWT string `json:"jwt"`
 }
 
 type ErrorBody struct {
