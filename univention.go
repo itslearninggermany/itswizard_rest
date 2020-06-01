@@ -17,9 +17,9 @@ type Request struct {
 }
 
 type Response struct {
-	Status string      `json:"status"`
-	Error  string      `json:"error"`
-	Body   interface{} `json:"body"`
+	Status  string `json:"status"`
+	Error   error  `json:"error"`
+	Message string `json:"message"`
 }
 
 type ErrorBody struct {
@@ -105,13 +105,13 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 	err = json.Unmarshal(body, &auth)
 	if err != nil || status != "200 OK" {
 		if err != nil {
-			b, err := json.Marshal(ErrorBody{error: err.Error()})
+			_, err := json.Marshal(ErrorBody{error: err.Error()})
 			if err != nil {
 				return nil, Response{}, err
 			}
 			return nil, Response{
 				//				Header: header,
-				Body: string(b),
+				//			Body: string(b),
 			}, err
 		}
 
@@ -123,6 +123,6 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 	request.Endpoint = endpoint
 	return request, Response{
 		//		Header: header,
-		Body: string(body),
+		//		Body: string(body),
 	}, nil
 }
