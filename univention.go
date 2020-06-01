@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"github.com/itslearninggermany/itswizard_handlingerrors"
 	"github.com/itslearninggermany/itswizard_rest"
 	"github.com/jinzhu/gorm"
 	"github.com/segmentio/objconv/json"
@@ -133,18 +134,19 @@ func NewRequest(endpoint, username, password string) (request *Request, response
 /*
 Sets a status Code and an Error JSON in the body
 */
-func ResponseError(statusNumber int, err error, w http.ResponseWriter) error {
+func ResponseError(statusNumber int, err error, w http.ResponseWriter, userName string, dbWebserver *gorm.DB) {
 	w.WriteHeader(statusNumber)
 	b, err := json.Marshal(itswizard_rest.Response{
 		Status: strconv.Itoa(statusNumber),
 		Error:  err,
 	})
 	if err != nil {
-		return err
+		itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
+		return
 	}
 	_, err = fmt.Fprint(w, string(b))
 	if err != nil {
-		return err
+		itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
+		return
 	}
-	return nil
 }
