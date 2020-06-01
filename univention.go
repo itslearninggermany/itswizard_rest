@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/itslearninggermany/itswizard_handlingerrors"
-	"github.com/itslearninggermany/itswizard_rest"
 	"github.com/jinzhu/gorm"
 	"github.com/segmentio/objconv/json"
 	"io/ioutil"
@@ -136,7 +135,7 @@ Sets a status Code and an Error JSON in the body
 */
 func ResponseError(statusNumber int, err error, w http.ResponseWriter, userName string, dbWebserver *gorm.DB) {
 	w.WriteHeader(statusNumber)
-	b, err := json.Marshal(itswizard_rest.Response{
+	b, err := json.Marshal(Response{
 		Status: strconv.Itoa(statusNumber),
 		Error:  err,
 	})
