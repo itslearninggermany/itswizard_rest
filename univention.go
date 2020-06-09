@@ -16,11 +16,11 @@ Databasestructure for univention
 
 type UniventionUploads struct {
 	gorm.Model
-	UserID         int
-	OrganisationID int
-	InstitutionID  int
+	UserID         uint
+	OrganisationID uint
+	InstitutionID  uint
 	Filename       string
-	Data           []byte `gorm:"type:MEDIUMTEXT"`
+	Data           string `gorm:"type:MEDIUMTEXT"`
 	Success        bool
 }
 
