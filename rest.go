@@ -300,3 +300,40 @@ func ResponseError500(w http.ResponseWriter, userName string, dbWebserver *gorm.
 	ResponseError(500, errors.New("Internal Server Error"), w, userName, dbWebserver)
 	itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
 }
+
+/*
+Return the person
+*/
+func (p *RestSession) TokenValid() (bool, error) {
+	req, err := http.NewRequest("POST", p.endpoint+"/tokenValid", bytes.NewBuffer([]byte("")))
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", p.token)
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	if string(body) == "Token is expired" {
+		return false, errors.New(string(body))
+	}
+	if string(body) == "Token is valid" {
+		return true, nil
+	}
+	return false, err
+}
