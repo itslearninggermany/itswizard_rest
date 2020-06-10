@@ -24,8 +24,8 @@ type UniventionUploads struct {
 	Success        bool
 }
 
-const SendDataFromUnivnetionApi = "/univention/Data"
-const SendLogFromUnivnetionApi = "/univention/Log"
+const SendDataFromUnivnetionApi = "/univention/data"
+const SendLogFromUnivnetionApi = "/univention/log"
 
 /*
 Send JSON-Files with User and Groups
