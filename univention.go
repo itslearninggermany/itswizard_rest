@@ -76,19 +76,19 @@ func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (send
 /*
 Send Logfile from UCS-System
 */
-func (p *RestSession) SendLogFromUnivention(filename string, data []byte) (sendData SendDataFromUniventionResponse, err error) {
+func (p *RestSession) SendLogFromUnivention(data []byte) error {
 	o := SendDataFromUniventionRequest{
-		Filename: filename,
+		Filename: "logfile.txt",
 		Content:  string(data),
 	}
 
 	b, err := json.Marshal(o)
 	if err != nil {
-		return sendData, err
+		return err
 	}
 	req, err := http.NewRequest("POST", p.Endpoint+SendLogFromUnivnetionApi, bytes.NewBuffer(b))
 	if err != nil {
-		return sendData, err
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
@@ -98,23 +98,18 @@ func (p *RestSession) SendLogFromUnivention(filename string, data []byte) (sendD
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		return sendData, err
+		return err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return sendData, err
+		return err
 	}
 
 	if string(body) == "Token is expired" {
-		sendData.Error = errors.New(string(body))
-	} else {
-		err := json.Unmarshal(body, &sendData)
-		if err != nil {
-			return sendData, err
-		}
+		return errors.New(string(body))
 	}
 
-	return sendData, err
+	return err
 }
