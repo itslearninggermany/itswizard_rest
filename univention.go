@@ -37,12 +37,12 @@ func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (send
 	if err != nil {
 		return sendData, err
 	}
-	req, err := http.NewRequest("POST", p.endpoint+"/univention", bytes.NewBuffer(b))
+	req, err := http.NewRequest("POST", p.Endpoint+"/univention", bytes.NewBuffer(b))
 	if err != nil {
 		return sendData, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", p.token)
+	req.Header.Set("Authorization", p.Token)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
