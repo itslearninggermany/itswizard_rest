@@ -64,7 +64,7 @@ func NewSession(endpoint, username, password string) (session RestSession, err e
 	return session, nil
 }
 
-func LoadSession(filepath, username, password string) (RestSession, error) {
+func LoadSession(filepath, username, password, endpoint string) (RestSession, error) {
 	restSession := RestSession{}
 	setupByte, err := ioutil.ReadFile(filepath)
 	if err != nil {
@@ -74,6 +74,9 @@ func LoadSession(filepath, username, password string) (RestSession, error) {
 	if err != nil {
 		return restSession, err
 	}
+	//Update Version
+	restSession.Endpoint = endpoint
+
 	valid, err := restSession.TokenValid()
 	if err != nil {
 		return restSession, err
