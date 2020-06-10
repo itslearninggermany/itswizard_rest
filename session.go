@@ -74,7 +74,7 @@ func LoadSession(filepath, username, password, endpoint string) (RestSession, er
 	if err != nil {
 		return restSession, err
 	}
-	//Update Version
+	//Update VersionK
 	restSession.Endpoint = endpoint
 
 	valid, err := restSession.TokenValid()
