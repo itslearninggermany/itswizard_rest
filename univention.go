@@ -50,10 +50,10 @@ const SendAesKeyFromUnivnetionApi = "/univention/aeskey"
 /*
 Send AES-Key to itslearning
 */
-func (p *RestSession) SendAesKeyFromUnivention(username string) (string, error) {
+func (p *RestSession) SendAesKeyFromUnivention(username string) (string, []byte, error) {
 	aes, err := itswizard_aes.NewAes()
 	if err != nil {
-		return "", err
+		return "", []byte(""), err
 	}
 	o := SendAesKeyFromUniventionRequest{
 		Username: username,
@@ -61,11 +61,11 @@ func (p *RestSession) SendAesKeyFromUnivention(username string) (string, error) 
 	}
 	b, err := json.Marshal(o)
 	if err != nil {
-		return "", err
+		return "", []byte(""), err
 	}
 	req, err := http.NewRequest("POST", p.Endpoint+SendAesKeyFromUnivnetionApi, bytes.NewBuffer(b))
 	if err != nil {
-		return "", err
+		return "", []byte(""), err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
@@ -75,23 +75,22 @@ func (p *RestSession) SendAesKeyFromUnivention(username string) (string, error) 
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", []byte(""), err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
-		return "", err
+		return "", []byte(""), err
 	}
 
 	if string(body) == "Token is expired" {
-		return string(body), errors.New(string(body))
+		return string(body), []byte(""), errors.New(string(body))
 	}
 	if string(body) == "AESKey stored" {
-		return string(body), nil
+		return string(body), aes.GetAesKey(), nil
 	}
 
-	return "", errors.New(string(body))
+	return "", []byte(""), errors.New(string(body))
 }
 
 /*

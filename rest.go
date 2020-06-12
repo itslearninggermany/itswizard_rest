@@ -182,6 +182,9 @@ func ResponseError(statusNumber int, err error, w http.ResponseWriter, userName 
 	}
 }
 
+/*
+...
+*/
 func ResponseError500(w http.ResponseWriter, userName string, dbWebserver *gorm.DB, err error) {
 	ResponseError(500, errors.New("Internal Server Error"), w, userName, dbWebserver)
 	itswizard_handlingerrors.WritingToErrorLog(dbWebserver, userName, err.Error())
