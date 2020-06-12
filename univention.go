@@ -97,6 +97,9 @@ func (p *RestSession) SendAesKeyFromUnivention(username string) (string, []byte,
 	if string(body) == "AESKey stored" {
 		return string(body), aes.GetAesKey(), nil
 	}
+	if string(body) == "AESKey updated" {
+		return string(body), aes.GetAesKey(), nil
+	}
 
 	return "", []byte(""), errors.New(string(body))
 }
