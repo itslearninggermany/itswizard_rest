@@ -34,7 +34,7 @@ type UniventionAes struct {
 
 type SendDataFromUniventionRequest struct {
 	Filename string `json:"filename"`
-	Content  string `json:"content"`
+	Content  []byte `json:"content"`
 }
 
 type SendAesKeyFromUniventionRequest struct {
@@ -110,7 +110,7 @@ Send JSON-Files with User and Groups
 func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (sendData SendDataFromUniventionResponse, err error) {
 	o := SendDataFromUniventionRequest{
 		Filename: filename,
-		Content:  string(data),
+		Content:  data,
 	}
 
 	b, err := json.Marshal(o)
@@ -156,7 +156,7 @@ Send Logfile from UCS-System
 func (p *RestSession) SendLogFromUnivention(data []byte) error {
 	o := SendDataFromUniventionRequest{
 		Filename: "logfile.txt",
-		Content:  string(data),
+		Content:  data,
 	}
 
 	b, err := json.Marshal(o)
