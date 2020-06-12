@@ -24,6 +24,14 @@ type UniventionUploads struct {
 	Success        bool
 }
 
+type UniventionAes struct {
+	gorm.Model
+	UserID         uint `gorm:"unique"`
+	OrganisationID uint
+	InstitutionID  uint
+	AesKey         []byte
+}
+
 type SendDataFromUniventionRequest struct {
 	Filename string `json:"filename"`
 	Content  string `json:"content"`
