@@ -81,20 +81,6 @@ type Login struct {
 	Password string `json:"password"`
 }
 
-type SendDataFromUniventionRequest struct {
-	Filename string `json:"filename"`
-	Content  string `json:"content"`
-}
-
-type SendDataFromUniventionResponse struct {
-	Error   interface{} `json:"error"`
-	Message struct {
-		Data        string `json:"data"`
-		Filename    string `json:"filename"`
-		Information string `json:"information"`
-	} `json:"message"`
-}
-
 /*
 Makes the data valid for the authentification
 */

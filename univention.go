@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"github.com/itslearninggermany/itswizard_aes"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +14,6 @@ import (
 /*
 Databasestructure for univention
 */
-
 type UniventionUploads struct {
 	gorm.Model
 	UserID         uint
@@ -24,8 +24,75 @@ type UniventionUploads struct {
 	Success        bool
 }
 
+type SendDataFromUniventionRequest struct {
+	Filename string `json:"filename"`
+	Content  string `json:"content"`
+}
+
+type SendAesKeyFromUniventionRequest struct {
+	Username string `json:"username"`
+	Key      []byte `json:"key"`
+}
+
+type SendDataFromUniventionResponse struct {
+	Error   interface{} `json:"error"`
+	Message struct {
+		Data        string `json:"data"`
+		Filename    string `json:"filename"`
+		Information string `json:"information"`
+	} `json:"message"`
+}
+
 const SendDataFromUnivnetionApi = "/univention/data"
 const SendLogFromUnivnetionApi = "/univention/log"
+const SendAesKeyFromUnivnetionApi = "/univention/aeskey"
+
+/*
+Send AES-Key to itslearning
+*/
+func (p *RestSession) SendAesKeyFromUnivention(username string) (string, error) {
+	aes, err := itswizard_aes.NewAes()
+	if err != nil {
+		return "", err
+	}
+	o := SendAesKeyFromUniventionRequest{
+		Username: username,
+		Key:      aes.GetAesKey(),
+	}
+	b, err := json.Marshal(o)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequest("POST", p.Endpoint+SendAesKeyFromUnivnetionApi, bytes.NewBuffer(b))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", p.Token)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	if string(body) == "Token is expired" {
+		return string(body), errors.New(string(body))
+	}
+	if string(body) == "AESKey stored" {
+		return string(body), nil
+	}
+
+	return "", errors.New(string(body))
+}
 
 /*
 Send JSON-Files with User and Groups
