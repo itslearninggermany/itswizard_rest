@@ -29,7 +29,7 @@ type UniventionAes struct {
 	UserID         uint `gorm:"unique"`
 	OrganisationID uint
 	InstitutionID  uint
-	AesKey         []byte
+	AesKey         string
 }
 
 type SendDataFromUniventionRequest struct {
