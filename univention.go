@@ -140,9 +140,9 @@ func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (send
 /*
 Send Logfile from UCS-System
 */
-func (p *RestSession) SendLogFromUnivention(data []byte) error {
+func (p *RestSession) SendLogFromUnivention(filename string, data []byte) error {
 	o := SendDataFromUniventionRequest{
-		Filename: "logfile.txt",
+		Filename: filename,
 		Content:  string(data),
 	}
 
