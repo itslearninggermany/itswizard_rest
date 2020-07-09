@@ -7,7 +7,9 @@ import (
 	"errors"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
 )
 
 /*
@@ -57,16 +59,30 @@ const SendAesKeyFromUnivnetionApi = "/univention/aeskey"
 /*
 Send AES-Key to itslearning
 */
-func (p *RestSession) SendAesKeyFromUnivention(aesKeyAsString string) (string, error) {
+func (p *RestSession) SendAesKeyFromUnivention(aesKeyAsString string, proxy string) (string, error) {
 	req, err := http.NewRequest("POST", p.Endpoint+SendAesKeyFromUnivnetionApi, bytes.NewBuffer([]byte(aesKeyAsString)))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
+
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -94,7 +110,7 @@ func (p *RestSession) SendAesKeyFromUnivention(aesKeyAsString string) (string, e
 /*
 Send JSON-Files with User and Groups
 */
-func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (sendData SendDataFromUniventionResponse, err error) {
+func (p *RestSession) SendDataFromUnivention(filename string, data []byte, proxy string) (sendData SendDataFromUniventionResponse, err error) {
 	o := SendDataFromUniventionRequest{
 		Filename: filename,
 		Content:  string(data),
@@ -110,9 +126,23 @@ func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (send
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
+
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -140,7 +170,7 @@ func (p *RestSession) SendDataFromUnivention(filename string, data []byte) (send
 /*
 Send Logfile from UCS-System
 */
-func (p *RestSession) SendLogFromUnivention(filename string, data []byte) error {
+func (p *RestSession) SendLogFromUnivention(filename string, data []byte, proxy string) error {
 	o := SendDataFromUniventionRequest{
 		Filename: filename,
 		Content:  string(data),
@@ -156,9 +186,23 @@ func (p *RestSession) SendLogFromUnivention(filename string, data []byte) error 
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
+
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -170,7 +214,6 @@ func (p *RestSession) SendLogFromUnivention(filename string, data []byte) error 
 	if err != nil {
 		return err
 	}
-
 	if string(body) == "Token is expired" {
 		return errors.New(string(body))
 	}
