@@ -10,7 +10,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/segmentio/objconv/json"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -114,7 +116,7 @@ func DecodeLogin(encoded string) (login Login, err error) {
 /*
 Return the person
 */
-func (p *RestSession) Me() (user User, err error) {
+func (p *RestSession) Me(proxy string) (user User, err error) {
 	req, err := http.NewRequest("POST", p.Endpoint+"/me", bytes.NewBuffer([]byte("")))
 	if err != nil {
 		return user, err
@@ -123,9 +125,22 @@ func (p *RestSession) Me() (user User, err error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
+
 	client := &http.Client{Transport: tr}
 
 	resp, err := client.Do(req)
@@ -193,7 +208,7 @@ func ResponseError500(w http.ResponseWriter, userName string, dbWebserver *gorm.
 /*
 Return the person
 */
-func (p *RestSession) TokenValid() (bool, error) {
+func (p *RestSession) TokenValid(proxy string) (bool, error) {
 	req, err := http.NewRequest("POST", p.Endpoint+"/tokenValid", bytes.NewBuffer([]byte("")))
 	if err != nil {
 		return false, err
@@ -202,9 +217,22 @@ func (p *RestSession) TokenValid() (bool, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.Token)
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
+
 	client := &http.Client{Transport: tr}
 
 	resp, err := client.Do(req)
