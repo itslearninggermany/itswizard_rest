@@ -91,7 +91,7 @@ func LoadSession(filepath, proxy, username, password, endpoint string) (RestSess
 	//Update VersionK
 	restSession.Endpoint = endpoint
 
-	valid, err := restSession.TokenValid()
+	valid, err := restSession.TokenValid(proxy)
 	if err != nil {
 		return restSession, err
 	}
