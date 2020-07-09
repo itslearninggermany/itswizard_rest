@@ -60,9 +60,7 @@ func NewSession(endpoint, proxy, username, password string) (session RestSession
 	status := resp.Status
 
 	if status != "200 OK" {
-		if err != nil {
-			return session, errors.New("Status: " + status + "Header: " + fmt.Sprint(resp.Header) + "Body: " + string(body))
-		}
+		return session, errors.New("Status: " + status + "Header: " + fmt.Sprint(resp.Header) + "Body: " + string(body))
 	}
 
 	var responseStruct AuthentificationResponse
