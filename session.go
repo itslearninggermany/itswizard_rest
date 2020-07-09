@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
 )
 
 type RestSession struct {
@@ -18,7 +20,7 @@ type RestSession struct {
 /*
 Get a new Request
 */
-func NewSession(endpoint, username, password string) (session RestSession, err error) {
+func NewSession(endpoint, proxy, username, password string) (session RestSession, err error) {
 	enc, err := CreateLogin(username, password)
 	if err != nil {
 		return session, err
@@ -31,8 +33,20 @@ func NewSession(endpoint, username, password string) (session RestSession, err e
 	req.Header.Set("Content-Type", "application/file")
 	req.Header.Set("Authorization", enc)
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	tr := &http.Transport{}
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Println(err)
+		}
+		tr = &http.Transport{
+			Proxy:           http.ProxyURL(proxyUrl),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
 	}
 	client := &http.Client{Transport: tr}
 
@@ -64,7 +78,7 @@ func NewSession(endpoint, username, password string) (session RestSession, err e
 	return session, nil
 }
 
-func LoadSession(filepath, username, password, endpoint string) (RestSession, error) {
+func LoadSession(filepath, proxy, username, password, endpoint string) (RestSession, error) {
 	restSession := RestSession{}
 	setupByte, err := ioutil.ReadFile(filepath)
 	if err != nil {
@@ -82,7 +96,7 @@ func LoadSession(filepath, username, password, endpoint string) (RestSession, er
 		return restSession, err
 	}
 	if !valid {
-		restSession, err = NewSession(restSession.Endpoint, username, password)
+		restSession, err = NewSession(restSession.Endpoint, proxy, username, password)
 		if err != nil {
 			return restSession, err
 		}
